@@ -20,6 +20,16 @@ export interface Category {
   updated_at: string;
 }
 
+export interface Activity {
+  id: number;
+  name: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+  category_id: number;
+  duration: number;
+}
+
 export interface PaginationQuery {
   page: number;
   pageSize: number;
@@ -139,6 +149,62 @@ export const categoriesApi = {
     });
     if (!response.ok) {
       throw new Error('Failed to delete category');
+    }
+    return response.json();
+  },
+};
+
+export const activitiesApi = {
+  getActivities: async (query: PaginationQuery): Promise<ApiResponse<Activity[]>> => {
+    const response = await fetch(
+      `${API_BASE_URL}/activities?page=${query.page}&pageSize=${query.pageSize}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch activities');
+    }
+    return response.json();
+  },
+  createActivity: async (activity: Omit<Activity, 'id'>): Promise<ApiResponse<Activity>> => {
+    const response = await fetch(`${API_BASE_URL}/activities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(activity),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create activity');
+    }
+    return response.json();
+  },
+  updateActivity: async (id: number, activity: Partial<Activity>): Promise<ApiResponse<Activity>> => {
+    const response = await fetch(`${API_BASE_URL}/activities/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(activity),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update activity');
+    }
+    return response.json();
+  },
+  deleteActivity: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await fetch(`${API_BASE_URL}/activities/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete activity');
     }
     return response.json();
   },
