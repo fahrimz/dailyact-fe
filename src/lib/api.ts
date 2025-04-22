@@ -1,0 +1,117 @@
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+export type Role = 'user' | 'admin';
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  picture: string;
+  role: Role;
+  created_at: string;
+  last_login_at: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaginationQuery {
+  page: number;
+  pageSize: number;
+}
+
+export interface PaginationResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+}
+
+export interface ApiResponse<T> {
+  message: string;
+  data: T;
+  pagination?: {
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+}
+
+export interface LoginResponse {
+  token: string;
+  user: User;
+}
+
+export const authApi = {
+  verifyGoogleToken: async (idToken: string): Promise<ApiResponse<LoginResponse>> => {
+    const response = await fetch(`${API_BASE_URL}/auth/google/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id_token: idToken }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to verify Google token');
+    }
+    return response.json();
+  },
+  getCurrentUser: async (): Promise<ApiResponse<User>> => {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch current user');
+    }
+    return response.json();
+  },
+
+  logout: async (): Promise<ApiResponse<void>> => {
+    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to logout');
+    }
+    return response.json();
+  },
+};
+
+export const categoriesApi = {
+  getCategories: async (query: PaginationQuery): Promise<ApiResponse<Category[]>> => {
+    const response = await fetch(
+      `${API_BASE_URL}/categories?page=${query.page}&pageSize=${query.pageSize}`
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch categories');
+    }
+    return response.json();
+  },
+
+  createCategory: async (category: Pick<Category, 'name' | 'description'>): Promise<ApiResponse<Category>> => {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(category),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create category');
+    }
+    return response.json();
+  },
+};
