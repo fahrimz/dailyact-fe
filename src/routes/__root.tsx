@@ -4,6 +4,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import Header from "../components/Header";
 import { UserProvider, useUser } from "../contexts/UserContext";
+import { Toaster } from "@/components/ui/sonner";
 
 function Root() {
 	const { user } = useUser();
@@ -12,6 +13,7 @@ function Root() {
 		<div className="min-h-screen bg-background font-sans antialiased">
 			<Header user={user} />
 			<Outlet />
+			<Toaster closeButton />
 			<TanStackRouterDevtools />
 		</div>
 	);

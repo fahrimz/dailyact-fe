@@ -114,4 +114,32 @@ export const categoriesApi = {
     }
     return response.json();
   },
+
+  updateCategory: async (id: number, category: Pick<Category, 'name' | 'description'>): Promise<ApiResponse<Category>> => {
+    const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(category),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update category');
+    }
+    return response.json();
+  },
+
+  deleteCategory: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete category');
+    }
+    return response.json();
+  },
 };

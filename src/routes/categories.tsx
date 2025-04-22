@@ -5,6 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { createFileRoute } from "@tanstack/react-router";
 import { categoriesApi, authApi } from "@/lib/api";
 import type { Category, User } from "@/lib/api";
+import { EditCategoryDialog } from "@/components/EditCategoryDialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/categories")({  
   component: CategoriesPage,
@@ -15,6 +18,8 @@ function CategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -63,8 +68,10 @@ function CategoriesPage() {
       setIsAddingCategory(false);
       loadCategories();
       setError(null);
+      toast.success("Category created successfully");
     } catch (err) {
       setError("Failed to create category");
+      toast.error("Failed to create category");
       console.error(err);
     }
   };
@@ -95,10 +102,19 @@ function CategoriesPage() {
                 </p>
                 {currentUser?.role === 'admin' && (
                   <div className="flex gap-2 mt-4">
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setEditingCategory(category)}
+                    >
                       Edit
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-600">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-600"
+                      onClick={() => setDeletingCategory(category)}
+                    >
                       Delete
                     </Button>
                   </div>
@@ -116,40 +132,30 @@ function CategoriesPage() {
       {/* Add Category Form */}
       {isAddingCategory && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add Category</h2>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              {error && (
-                <div className="text-sm text-red-600">{error}</div>
-              )}
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Add Category</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
                 <Input
-                  type="text"
-                  placeholder="Category name"
                   value={formData.name}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                    setFormData({ ...formData, name: e.target.value })
                   }
+                  placeholder="Category name"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Description
-                </label>
                 <Textarea
-                  placeholder="Category description"
                   value={formData.description}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
+                    setFormData({ ...formData, description: e.target.value })
                   }
+                  placeholder="Category description"
                   required
                 />
               </div>
+              {error && <p className="text-red-500">{error}</p>}
               <div className="flex justify-end gap-2">
                 <Button
                   type="button"
@@ -158,11 +164,52 @@ function CategoriesPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Save</Button>
+                <Button type="submit">Add Category</Button>
               </div>
             </form>
           </div>
         </div>
+      )}
+
+      {/* Edit Category Dialog */}
+      {editingCategory && (
+        <EditCategoryDialog
+          category={editingCategory}
+          open={!!editingCategory}
+          onOpenChange={(open) => !open && setEditingCategory(null)}
+          onSave={async (data) => {
+            try {
+              await categoriesApi.updateCategory(editingCategory.id, data);
+              toast.success("Category updated successfully");
+              loadCategories();
+            } catch (err) {
+              toast.error("Failed to update category");
+              throw err;
+            }
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deletingCategory && (
+        <ConfirmDialog
+          open={!!deletingCategory}
+          onOpenChange={(open) => !open && setDeletingCategory(null)}
+          title="Delete Category"
+          description={`Are you sure you want to delete '${deletingCategory.name}'? This action cannot be undone.`}
+          confirmLabel="Delete"
+          variant="destructive"
+          onConfirm={async () => {
+            try {
+              await categoriesApi.deleteCategory(deletingCategory.id);
+              toast.success("Category deleted successfully");
+              loadCategories();
+              setDeletingCategory(null);
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : "Failed to delete category");
+            }
+          }}
+        />
       )}
     </div>
   );
