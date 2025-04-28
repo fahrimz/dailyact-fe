@@ -22,13 +22,22 @@ export interface Category {
 
 export interface Activity {
   id: number;
-  name: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  duration: number;
   description: string;
+  notes: string;
+  category_id: number;
+  category: {
+    id: number;
+    name: string;
+  };
   created_at: string;
   updated_at: string;
-  category_id: number;
-  duration: number;
 }
+
+export interface CreateActivity extends Omit<Activity, "id" | "category" | "date" | "duration" | "created_at" | "updated_at"> {}
 
 export interface PaginationQuery {
   page: number;
@@ -168,14 +177,14 @@ export const activitiesApi = {
     }
     return response.json();
   },
-  createActivity: async (activity: Omit<Activity, 'id'>): Promise<ApiResponse<Activity>> => {
+  createActivity: async (payload: CreateActivity): Promise<ApiResponse<Activity>> => {
     const response = await fetch(`${API_BASE_URL}/activities`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
-      body: JSON.stringify(activity),
+      body: JSON.stringify(payload),
     });
     if (!response.ok) {
       throw new Error('Failed to create activity');

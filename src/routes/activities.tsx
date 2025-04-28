@@ -3,32 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createFileRoute } from "@tanstack/react-router";
-import { activitiesApi, categoriesApi } from "@/lib/api";
+import { activitiesApi, categoriesApi, type Activity, type CreateActivity } from "@/lib/api";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { DateTimePicker24h } from "@/components/ui/datetime-picker";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { readableDuration, readableDurationFromRange } from "@/lib/utils";
 
 export const Route = createFileRoute("/activities")({
   component: ActivitiesPage,
 });
-
-interface Activity {
-  id: number;
-  date: string;
-  start_time: string;
-  end_time: string;
-  duration: number;
-  description: string;
-  notes: string;
-  category_id: number;
-  category: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-  updated_at: string;
-}
 
 function ActivitiesPage() {
   const [view, setView] = useState<"list" | "calendar">("list");
@@ -39,18 +23,14 @@ function ActivitiesPage() {
   const [isAddingActivity, setIsAddingActivity] = useState(false);
   const [deletingActivity, setDeletingActivity] = useState<Activity | null>(null);
 
-  const [formData, setFormData] = useState({
-    name: "",
+  const [formData, setFormData] = useState<CreateActivity>({
     description: "",
     category_id: 0,
     start_time: "",
     end_time: "",
     notes: "",
   });
-  const duration = useMemo(() => {
-    return formData.end_time ? new Date(formData.end_time).getTime() - new Date(formData.start_time).getTime() : 0;
-  }, [formData]);
-  const durationInMinute = duration / 1000 / 60;
+  const duration = useMemo(() => readableDurationFromRange(formData.start_time, formData.end_time), [formData]);
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([]);
 
   useEffect(() => {
@@ -90,15 +70,14 @@ function ActivitiesPage() {
 
   const handleAddActivity = () => {
     setIsAddingActivity(true);
-    setFormData({ name: "", description: "", category_id: 0, start_time: "", end_time: "", notes: "" });
+    setFormData({ description: "", category_id: 0, start_time: "", end_time: "", notes: "" });
     setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const duration = new Date(formData.end_time).getTime() - new Date(formData.start_time).getTime();
-      await activitiesApi.createActivity({ ...formData, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), duration });
+      await activitiesApi.createActivity(formData);
       setIsAddingActivity(false);
       loadActivities();
       setError(null);
@@ -111,7 +90,7 @@ function ActivitiesPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 px-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Activities</h1>
         <div className="flex gap-4">
@@ -169,25 +148,24 @@ function ActivitiesPage() {
                 <div>
                   <p className="text-lg font-semibold">{activity.description}</p>
                   <p className="text-xs text-gray-500">
-                    {activity.category?.name || 'No category'} • {activity.duration / 1000 / 60} minutes
+                    {activity.category?.name || 'No category'} • {readableDuration(activity.duration, 's')}
                   </p>
                   {activity.notes && (
                     <p className="text-gray-600 mt-1">{activity.notes}</p>
                   )}
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-col gap-2">
                   <p className="text-sm font-medium">
                     {new Date(activity.start_time).toLocaleDateString()}
                   </p>
-                  <div className="flex gap-2">
-                    <Button
+
+                  <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setDeletingActivity(activity)}
                     >
                       Delete
-                    </Button>
-                  </div>
+                  </Button>
                 </div>
               </div>
             ))
@@ -207,9 +185,9 @@ function ActivitiesPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Input
-                  value={formData.name}
+                  value={formData.description}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setFormData({ ...formData, description: e.target.value })
                   }
                   placeholder="Activity name"
                   required
@@ -238,22 +216,11 @@ function ActivitiesPage() {
                 </div>
               </div>
               <div>
-                <span className="text-xs">Duration (in minute)</span>
+                <span className="text-xs">Duration</span>
                 <Input
-                  value={durationInMinute}
-                  type="number"
+                  value={duration}
                   placeholder="Duration"
                   readOnly
-                />
-              </div>
-              <div>
-                <Input
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Activity description"
-                  required
                 />
               </div>
               <div>
