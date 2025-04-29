@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createFileRoute } from "@tanstack/react-router";
-import { activitiesApi, categoriesApi, type Activity, type CreateActivity } from "@/lib/api";
+import { activitiesApi, categoriesApi, type Activity, type CreateActivity, type FilterActivity } from "@/lib/api";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { DateTimePicker24h } from "@/components/ui/datetime-picker";
@@ -33,15 +33,22 @@ function ActivitiesPage() {
   const duration = useMemo(() => readableDurationFromRange(formData.start_time, formData.end_time), [formData]);
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([]);
 
+  // filters
+  const [filter, setFilter] = useState<FilterActivity>({});
+
   useEffect(() => {
     loadActivities();
     loadCategories();
   }, []);
 
+  useEffect(() => {
+    loadActivities();
+  }, [filter]);
+
   const loadActivities = async () => {
     try {
       setLoading(true);
-      const response = await activitiesApi.getActivities({ page: 1, pageSize: 100 });
+      const response = await activitiesApi.getActivities({ page: 1, pageSize: 100, ...filter });
       setActivities(response.data);
       setError(null);
     } catch (err) {
@@ -119,12 +126,23 @@ function ActivitiesPage() {
         <Input
           type="date"
           className="w-auto"
+          onChange={(e) => {
+            setFilter(prev => ({...prev, start_date: e.target.value}))
+          }}
         />
-        <Select onValueChange={(value) => console.log(value)}>
+        <Select onValueChange={(value) => {
+          if (value === "all") {
+            setFilter(prev => ({...prev, category_id: undefined}))
+            return;
+          }
+
+          setFilter(prev => ({...prev, category_id: parseInt(value)}))
+        }}>
           <SelectTrigger className="w-auto">
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.id.toString()}>
                 {category.name}

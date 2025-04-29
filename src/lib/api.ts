@@ -44,6 +44,12 @@ export interface PaginationQuery {
   pageSize: number;
 }
 
+export interface FilterActivity {
+  category_id?: number;
+  start_date?: string;
+  end_date?: string;
+}
+
 export interface PaginationResponse<T> {
   data: T[];
   pagination: {
@@ -164,9 +170,23 @@ export const categoriesApi = {
 };
 
 export const activitiesApi = {
-  getActivities: async (query: PaginationQuery): Promise<ApiResponse<Activity[]>> => {
+  getActivities: async (query: PaginationQuery & FilterActivity): Promise<ApiResponse<Activity[]>> => {
+    const queryStr = new URLSearchParams();
+    queryStr.set('page', query.page.toString());
+    queryStr.set('pageSize', query.pageSize.toString());
+    if (query.category_id) {
+      queryStr.set('category_id', query.category_id.toString());
+    }
+    if (query.start_date) {
+      queryStr.set('start_date', query.start_date);
+    }
+    if (query.end_date) {
+      queryStr.set('end_date', query.end_date);
+    }
+
     const response = await fetch(
-      `${API_BASE_URL}/activities?page=${query.page}&pageSize=${query.pageSize}`, {
+      `${API_BASE_URL}/activities?${queryStr.toString()}`,
+      {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
