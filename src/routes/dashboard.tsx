@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dashboard")({  
+  beforeLoad: async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      return redirect({
+        to: "/login",
+      });
+    }
+  },
   component: DashboardPage,
 });
 

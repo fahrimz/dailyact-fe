@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { activitiesApi, categoriesApi, type Activity, type CreateActivity, type FilterActivity } from "@/lib/api";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -11,6 +11,15 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { readableDuration, readableDurationFromRange } from "@/lib/utils";
 
 export const Route = createFileRoute("/activities")({
+  beforeLoad: async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      return redirect({
+        to: "/login",
+      });
+    }
+  },
   component: ActivitiesPage,
 });
 
@@ -172,9 +181,31 @@ function ActivitiesPage() {
                     <p className="text-gray-600 mt-1">{activity.notes}</p>
                   )}
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col justify-between">
                   <p className="text-sm font-medium">
-                    {new Date(activity.start_time).toLocaleDateString()}
+                    {
+                      new Date(activity.start_time).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: false,
+                      })
+                    }
+
+                    {" - "}
+
+                    {
+                      new Date(activity.end_time).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        hour12: false,
+                      })
+                    }
                   </p>
 
                   <Button

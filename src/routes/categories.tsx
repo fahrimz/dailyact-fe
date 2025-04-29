@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { categoriesApi, authApi } from "@/lib/api";
 import type { Category, User } from "@/lib/api";
 import { EditCategoryDialog } from "@/components/EditCategoryDialog";
@@ -10,6 +10,15 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/categories")({  
+  beforeLoad: async () => {
+    const token = localStorage.getItem('token');
+        
+        if (!token) {
+          return redirect({
+            to: "/login",
+          });
+        }
+  },
   component: CategoriesPage,
 });
 
