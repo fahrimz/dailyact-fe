@@ -1,6 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export type Role = 'user' | 'admin';
+export type Role = 'user' | 'admin' | 'superadmin';
 
 export interface User {
   id: number;

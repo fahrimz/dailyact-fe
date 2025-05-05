@@ -31,12 +31,14 @@ export default function Header({ user }: { user: User | null }) {
                 >
                   Categories
                 </Link>
-                <Link
-                  to="/users"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900 [&.active]:text-blue-500 [&.active]:font-bold"
-                >
-                  Users
-                </Link>
+                {(user.role === "admin" || user.role === "superadmin") && (
+                  <Link
+                    to="/users"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900 [&.active]:text-blue-500 [&.active]:font-bold"
+                  >
+                    Users
+                  </Link>
+                )}
               </nav>
             )}
           </div>
