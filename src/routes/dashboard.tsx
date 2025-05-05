@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { activitiesApi } from "@/lib/api";
+import { readableDuration } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard")({  
   beforeLoad: async () => {
@@ -27,14 +30,46 @@ interface Activity {
 }
 
 function DashboardPage() {
-  const [recentActivities] = useState<Activity[]>([]);
+  const [todayActivities, setTodayActivities] = useState<Activity[]>([]);
+  const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const totalDuration = todayActivities.reduce((total, activity) => total + activity.duration, 0);
 
   useEffect(() => {
-    // TODO: Fetch recent activities from the backend
-    // This will be implemented when the backend endpoint is ready
-    setLoading(false);
+    setLoading(true);
+    
+    Promise.all([
+      getRecentActivities(),
+      getTodayActivities()
+    ]).then(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (error && error.length > 0) {
+      toast(error);
+    }
+  }, [error]);
+
+  const getTodayActivities = async () => {
+    try {
+          const response = await activitiesApi.getActivities({ page: 1, pageSize: 100, start_date: new Date().toISOString().split('T')[0], end_date: new Date().toISOString().split('T')[0] });
+          setTodayActivities(response.data);
+          setError(null);
+        } catch (err) {
+          setError('Failed to load activities');
+        }
+  }
+
+  const getRecentActivities = async () => {
+    try {
+      const response = await activitiesApi.getActivities({ page: 1, pageSize: 5 });
+      setRecentActivities(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load activities');
+    }
+  };
 
   return (
     <div className="container mx-auto py-8">
@@ -42,17 +77,14 @@ function DashboardPage() {
         {/* Summary Cards */}
         <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
           <h3 className="text-lg font-semibold">Today's Activities</h3>
-          <p className="text-3xl font-bold mt-2">0</p>
+          <p className="text-3xl font-bold mt-2">{todayActivities.length}</p>
         </div>
         
         <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
           <h3 className="text-lg font-semibold">Total Time Today</h3>
-          <p className="text-3xl font-bold mt-2">0h 0m</p>
-        </div>
-
-        <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <h3 className="text-lg font-semibold">Active Categories</h3>
-          <p className="text-3xl font-bold mt-2">0</p>
+          <p className="text-3xl font-bold mt-2">{
+            totalDuration > 0 ? readableDuration(totalDuration, 's') : '-'
+          }</p>
         </div>
       </div>
 
@@ -71,7 +103,7 @@ function DashboardPage() {
                 <div>
                   <p className="font-semibold">{activity.description}</p>
                   <p className="text-sm text-gray-500">
-                    {activity.category.name} • {activity.duration} minutes
+                    {activity.category.name} • {readableDuration(activity.duration, 's')}
                   </p>
                 </div>
                 <div className="text-sm text-gray-500">

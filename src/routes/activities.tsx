@@ -302,7 +302,7 @@ function ActivitiesPage() {
         <ConfirmDialog
           open={!!deletingActivity}
           onOpenChange={(open) => !open && setDeletingActivity(null)}
-          title="Delete Category"
+          title="Delete Activity"
           description={`Are you sure you want to delete? This action cannot be undone.`}
           confirmLabel="Delete"
           variant="destructive"
