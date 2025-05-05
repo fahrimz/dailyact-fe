@@ -1,16 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import type { User } from "@/lib/api";
 
-export default function Header({user}: {user: User | null}) {
+export default function Header({ user }: { user: User | null }) {
   return (
     <header className="border-b bg-white sticky top-0 h-(--h-header) flex items-center">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link
-              to="/"
-              className="text-xl font-bold text-gray-900"
-            >
+            <Link to="/" className="text-xl font-bold text-gray-900">
               DailyAct
             </Link>
 
@@ -18,25 +15,25 @@ export default function Header({user}: {user: User | null}) {
               <nav className="hidden md:flex items-center space-x-4">
                 <Link
                   to="/dashboard"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 [&.active]:text-blue-500 [&.active]:font-bold"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/activities"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 [&.active]:text-blue-500 [&.active]:font-bold"
                 >
                   Activities
                 </Link>
                 <Link
                   to="/categories"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 [&.active]:text-blue-500 [&.active]:font-bold"
                 >
                   Categories
                 </Link>
                 <Link
                   to="/users"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 [&.active]:text-blue-500 [&.active]:font-bold"
                 >
                   Users
                 </Link>
