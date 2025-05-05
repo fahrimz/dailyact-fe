@@ -86,7 +86,7 @@ function CategoriesPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 px-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Categories</h1>
         {currentUser?.role === 'admin' && (
@@ -140,7 +140,7 @@ function CategoriesPage() {
 
       {/* Add Category Form */}
       {isAddingCategory && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="fixed p-4 inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4">Add Category</h2>
             <form onSubmit={handleSubmit} className="space-y-4">

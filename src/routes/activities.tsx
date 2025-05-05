@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { DateTimePicker24h } from "@/components/ui/datetime-picker";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { readableDuration, readableDurationFromRange } from "@/lib/utils";
+import { readableDuration, readableDurationFromRange, readableRange } from "@/lib/utils";
 
 export const Route = createFileRoute("/activities")({
   beforeLoad: async () => {
@@ -110,7 +110,7 @@ function ActivitiesPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Activities</h1>
         <div className="flex gap-4">
-          <div className="flex rounded-md shadow-sm">
+          {/* <div className="flex rounded-md shadow-sm">
             <Button
               variant={view === "list" ? "default" : "outline"}
               onClick={() => setView("list")}
@@ -125,7 +125,7 @@ function ActivitiesPage() {
             >
               Calendar
             </Button>
-          </div>
+          </div> */}
           <Button onClick={handleAddActivity}>Add Activity</Button>
         </div>
       </div>
@@ -134,7 +134,6 @@ function ActivitiesPage() {
       <div className="flex gap-4 mb-6">
         <Input
           type="date"
-          className="w-auto"
           onChange={(e) => {
             setFilter(prev => ({...prev, start_date: e.target.value}))
           }}
@@ -147,7 +146,7 @@ function ActivitiesPage() {
 
           setFilter(prev => ({...prev, category_id: parseInt(value)}))
         }}>
-          <SelectTrigger className="w-auto">
+          <SelectTrigger>
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
@@ -170,7 +169,7 @@ function ActivitiesPage() {
             activities.map((activity) => (
               <div
                 key={activity.id}
-                className="flex items-center justify-between rounded-lg border p-4"
+                className="flex flex-col sm:flex-row gap-4 justify-between rounded-lg border p-4"
               >
                 <div>
                   <p className="text-lg font-semibold">{activity.description}</p>
@@ -181,31 +180,9 @@ function ActivitiesPage() {
                     <p className="text-gray-600 mt-1">{activity.notes}</p>
                   )}
                 </div>
-                <div className="flex flex-col justify-between">
-                  <p className="text-sm font-medium">
-                    {
-                      new Date(activity.start_time).toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        hour12: false,
-                      })
-                    }
-
-                    {" - "}
-
-                    {
-                      new Date(activity.end_time).toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        hour12: false,
-                      })
-                    }
+                <div className="flex flex-row sm:flex-col w-full sm:w-auto items-center justify-between gap-2">
+                  <p className="text-xs font-medium">
+                    {readableRange(activity.start_time, activity.end_time)}
                   </p>
 
                   <Button

@@ -72,7 +72,7 @@ function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 px-4">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Summary Cards */}
         <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
