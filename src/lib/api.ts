@@ -117,7 +117,7 @@ export const authApi = {
 export const categoriesApi = {
   getCategories: async (query: PaginationQuery): Promise<ApiResponse<Category[]>> => {
     const response = await fetch(
-      `${API_BASE_URL}/categories?page=${query.page}&pageSize=${query.pageSize}`
+      `${API_BASE_URL}/categories?page=${query.page}&page_size=${query.pageSize}`
     );
     if (!response.ok) {
       throw new Error('Failed to fetch categories');
@@ -173,7 +173,7 @@ export const activitiesApi = {
   getActivities: async (query: PaginationQuery & FilterActivity): Promise<ApiResponse<Activity[]>> => {
     const queryStr = new URLSearchParams();
     queryStr.set('page', query.page.toString());
-    queryStr.set('pageSize', query.pageSize.toString());
+    queryStr.set('page_size', query.pageSize.toString());
     if (query.category_id) {
       queryStr.set('category_id', query.category_id.toString());
     }
