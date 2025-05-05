@@ -1,19 +1,35 @@
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { activitiesApi, categoriesApi, type Activity, type CreateActivity, type FilterActivity } from "@/lib/api";
+import {
+  activitiesApi,
+  categoriesApi,
+  type Activity,
+  type CreateActivity,
+  type FilterActivity,
+} from "@/lib/api";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { DateTimePicker24h } from "@/components/ui/datetime-picker";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { readableDuration, readableDurationFromRange, readableRange } from "@/lib/utils";
+import {
+  readableDuration,
+  readableDurationFromRange,
+  readableRange,
+} from "@/lib/utils";
 
 export const Route = createFileRoute("/activities")({
   beforeLoad: async () => {
-    const token = localStorage.getItem('token');
-    
+    const token = localStorage.getItem("token");
+
     if (!token) {
       return redirect({
         to: "/login",
@@ -28,9 +44,11 @@ function ActivitiesPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [isAddingActivity, setIsAddingActivity] = useState(false);
-  const [deletingActivity, setDeletingActivity] = useState<Activity | null>(null);
+  const [deletingActivity, setDeletingActivity] = useState<Activity | null>(
+    null
+  );
 
   const [formData, setFormData] = useState<CreateActivity>({
     description: "",
@@ -39,8 +57,13 @@ function ActivitiesPage() {
     end_time: "",
     notes: "",
   });
-  const duration = useMemo(() => readableDurationFromRange(formData.start_time, formData.end_time), [formData]);
-  const [categories, setCategories] = useState<{ id: number, name: string }[]>([]);
+  const duration = useMemo(
+    () => readableDurationFromRange(formData.start_time, formData.end_time),
+    [formData]
+  );
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
+    []
+  );
 
   // filters
   const [filter, setFilter] = useState<FilterActivity>({});
@@ -57,11 +80,15 @@ function ActivitiesPage() {
   const loadActivities = async () => {
     try {
       setLoading(true);
-      const response = await activitiesApi.getActivities({ page: 1, pageSize: 100, ...filter });
+      const response = await activitiesApi.getActivities({
+        page: 1,
+        pageSize: 100,
+        ...filter,
+      });
       setActivities(response.data);
       setError(null);
     } catch (err) {
-      setError('Failed to load activities');
+      setError("Failed to load activities");
     } finally {
       setLoading(false);
     }
@@ -69,7 +96,10 @@ function ActivitiesPage() {
 
   const loadCategories = async () => {
     try {
-      const response = await categoriesApi.getCategories({ page: 1, pageSize: 100 });
+      const response = await categoriesApi.getCategories({
+        page: 1,
+        pageSize: 100,
+      });
       setCategories(response.data);
     } catch (err) {
       console.error(err);
@@ -80,13 +110,18 @@ function ActivitiesPage() {
     try {
       await activitiesApi.deleteActivity(id);
       loadActivities();
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const handleAddActivity = () => {
     setIsAddingActivity(true);
-    setFormData({ description: "", category_id: 0, start_time: "", end_time: "", notes: "" });
+    setFormData({
+      description: "",
+      category_id: 0,
+      start_time: "",
+      end_time: "",
+      notes: "",
+    });
     setError(null);
   };
 
@@ -131,21 +166,24 @@ function ActivitiesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 mb-6 sm:w-md">
         <Input
+          className="sm:w-auto"
           type="date"
           onChange={(e) => {
-            setFilter(prev => ({...prev, start_date: e.target.value}))
+            setFilter((prev) => ({ ...prev, start_date: e.target.value }));
           }}
         />
-        <Select onValueChange={(value) => {
-          if (value === "all") {
-            setFilter(prev => ({...prev, category_id: undefined}))
-            return;
-          }
+        <Select
+          onValueChange={(value) => {
+            if (value === "all") {
+              setFilter((prev) => ({ ...prev, category_id: undefined }));
+              return;
+            }
 
-          setFilter(prev => ({...prev, category_id: parseInt(value)}))
-        }}>
+            setFilter((prev) => ({ ...prev, category_id: parseInt(value) }));
+          }}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
@@ -163,7 +201,7 @@ function ActivitiesPage() {
       {/* Activities List/Calendar View */}
       {loading ? (
         <p>Loading...</p>
-      ) : view === 'list' ? (
+      ) : view === "list" ? (
         <div className="space-y-4">
           {activities.length > 0 ? (
             activities.map((activity) => (
@@ -172,9 +210,12 @@ function ActivitiesPage() {
                 className="flex flex-col sm:flex-row gap-4 justify-between rounded-lg border p-4"
               >
                 <div>
-                  <p className="text-lg font-semibold">{activity.description}</p>
+                  <p className="text-lg font-semibold">
+                    {activity.description}
+                  </p>
                   <p className="text-xs text-gray-500">
-                    {activity.category?.name || 'No category'} • {readableDuration(activity.duration, 's')}
+                    {activity.category?.name || "No category"} •{" "}
+                    {readableDuration(activity.duration, "s")}
                   </p>
                   {activity.notes && (
                     <p className="text-gray-600 mt-1">{activity.notes}</p>
@@ -186,11 +227,11 @@ function ActivitiesPage() {
                   </p>
 
                   <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setDeletingActivity(activity)}
-                    >
-                      Delete
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setDeletingActivity(activity)}
+                  >
+                    Delete
                   </Button>
                 </div>
               </div>
@@ -219,13 +260,20 @@ function ActivitiesPage() {
                   required
                 />
               </div>
-              <Select onValueChange={(e) => setFormData({ ...formData, category_id: parseInt(e) })}>
+              <Select
+                onValueChange={(e) =>
+                  setFormData({ ...formData, category_id: parseInt(e) })
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id.toString()}>
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
                       {category.name}
                     </SelectItem>
                   ))}
@@ -234,20 +282,27 @@ function ActivitiesPage() {
               <div className="flex flex-row gap-2">
                 <div>
                   <span className="text-xs">Time Start</span>
-                  <DateTimePicker24h onDateSelected={date => setFormData({ ...formData, start_time: date.toISOString() })} />
+                  <DateTimePicker24h
+                    onDateSelected={(date) =>
+                      setFormData({
+                        ...formData,
+                        start_time: date.toISOString(),
+                      })
+                    }
+                  />
                 </div>
                 <div>
                   <span className="text-xs">Time End</span>
-                  <DateTimePicker24h onDateSelected={date => setFormData({ ...formData, end_time: date.toISOString() })} />
+                  <DateTimePicker24h
+                    onDateSelected={(date) =>
+                      setFormData({ ...formData, end_time: date.toISOString() })
+                    }
+                  />
                 </div>
               </div>
               <div>
                 <span className="text-xs">Duration</span>
-                <Input
-                  value={duration}
-                  placeholder="Duration"
-                  readOnly
-                />
+                <Input value={duration} placeholder="Duration" readOnly />
               </div>
               <div>
                 <Textarea
