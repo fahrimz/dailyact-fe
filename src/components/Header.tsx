@@ -34,6 +34,12 @@ export default function Header({user}: {user: User | null}) {
                 >
                   Categories
                 </Link>
+                <Link
+                  to="/users"
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  Users
+                </Link>
               </nav>
             )}
           </div>

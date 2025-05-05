@@ -50,6 +50,10 @@ export interface FilterActivity {
   end_date?: string;
 }
 
+export interface FilterUser {
+  search?: string;
+}
+
 export interface PaginationResponse<T> {
   data: T[];
   pagination: {
@@ -234,6 +238,37 @@ export const activitiesApi = {
     });
     if (!response.ok) {
       throw new Error('Failed to delete activity');
+    }
+    return response.json();
+  },
+};
+
+export const usersApi = {
+  getUsers: async (query: PaginationQuery & FilterUser): Promise<ApiResponse<User[]>> => {
+    const response = await fetch(
+      `${API_BASE_URL}/users?page=${query.page}&page_size=${query.pageSize}&name=${query.search || ''}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch users');
+    }
+    return response.json();
+  },
+  createUser: async (user: Omit<User, 'id' | 'created_at' | 'last_login_at'>): Promise<ApiResponse<User>> => {
+    const response = await fetch(`${API_BASE_URL}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(user),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create user');
     }
     return response.json();
   },
