@@ -1,7 +1,21 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { InputDialog } from "@/components/InputDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { type User, usersApi, type FilterUser } from "@/lib/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  type User,
+  usersApi,
+  type FilterUser,
+  type Role,
+  ROLES,
+} from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -14,6 +28,8 @@ function RouteComponent() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [changingRole, setChangingRole] = useState<User | null>(null);
 
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
 
@@ -58,6 +74,20 @@ function RouteComponent() {
       // TODO: implement delete user
       toast.error("This feature is not implemented yet");
     } catch (err) {}
+  };
+
+  const changeRole = async (id: number, role: Role) => {
+    try {
+      await usersApi.changeRole(id, role);
+      setUsers((prev) =>
+        prev.map((user) => (user.id === id ? { ...user, role } : user))
+      );
+      toast.success("User role updated successfully");
+    } catch (err) {
+      toast.error("Failed to update user role");
+    } finally {
+      setChangingRole(null);
+    }
   };
 
   return (
@@ -117,13 +147,22 @@ function RouteComponent() {
                     })}
                   </p>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeletingUser(user)}
-                  >
-                    Delete
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setChangingRole(user)}
+                    >
+                      Change Role
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDeletingUser(user)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))
@@ -144,6 +183,49 @@ function RouteComponent() {
           variant="destructive"
           onConfirm={() => handleDelete(deletingUser.id)}
         />
+      )}
+
+      {/* Change role dialog */}
+      {changingRole && (
+        <InputDialog
+          title="Change User Role"
+          open={!!changingRole}
+          onOpenChange={(open) => !open && setChangingRole(null)}
+          onSave={() => changeRole(changingRole.id, changingRole.role)}
+          loading={loading}
+          error={error}
+        >
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-gray-500">
+              Select a new role for {changingRole.name} (currently{" "}
+              <strong className="text-red-500">
+                {changingRole.role[0].toUpperCase() +
+                  changingRole.role.slice(1)}
+              </strong>
+              )
+            </p>
+            <Select
+              onValueChange={(value) => {
+                if (!changingRole) return;
+
+                const role: Role = value as Role;
+                if (!role) return;
+                setChangingRole({...changingRole, role });
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a role" />
+              </SelectTrigger>
+              <SelectContent>
+                {ROLES.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </InputDialog>
       )}
     </div>
   );

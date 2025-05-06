@@ -1,6 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export type Role = 'user' | 'admin' | 'superadmin';
+export const ROLES = ['user', 'admin', 'superadmin'] as const;
+export type Role = typeof ROLES[number];
 
 export interface User {
   id: number;
@@ -288,6 +289,20 @@ export const usersApi = {
     });
     if (!response.ok) {
       throw new Error('Failed to create user');
+    }
+    return response.json();
+  },
+  changeRole: async (id: number, role: Role): Promise<ApiResponse<User>> => {
+    const response = await fetch(`${API_BASE_URL}/users/${id}/change_role`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ role }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to change user role');
     }
     return response.json();
   },
