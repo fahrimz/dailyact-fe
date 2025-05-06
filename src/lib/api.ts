@@ -37,6 +37,21 @@ export interface Activity {
   updated_at: string;
 }
 
+export interface AppFeedback {
+  id: number;
+  user_id: number;
+  feedback: string;
+  created_at: string;
+  updated_at: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+}
+
+export interface CreateAppFeedback extends Omit<AppFeedback, "id" | "created_at" | "updated_at" | "user" | "user_id"> {}
+
 export interface CreateActivity extends Omit<Activity, "id" | "category" | "date" | "duration" | "created_at" | "updated_at"> {}
 
 export interface PaginationQuery {
@@ -51,6 +66,10 @@ export interface FilterActivity {
 }
 
 export interface FilterUser {
+  search?: string;
+}
+
+export interface FilterAppFeedback {
   search?: string;
 }
 
@@ -269,6 +288,37 @@ export const usersApi = {
     });
     if (!response.ok) {
       throw new Error('Failed to create user');
+    }
+    return response.json();
+  },
+};
+
+export const appFeedbacksApi = {
+  getAppFeedbacks: async (query: PaginationQuery & FilterAppFeedback): Promise<ApiResponse<AppFeedback[]>> => {
+    const response = await fetch(
+      `${API_BASE_URL}/app_feedbacks?page=${query.page}&page_size=${query.pageSize}&search=${query.search || ''}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch app feedbacks');
+    }
+    return response.json();
+  },
+  createAppFeedback: async (feedback: CreateAppFeedback): Promise<ApiResponse<AppFeedback>> => {
+    const response = await fetch(`${API_BASE_URL}/app_feedbacks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(feedback),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to create app feedback');
     }
     return response.json();
   },

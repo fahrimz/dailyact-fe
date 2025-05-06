@@ -23,6 +23,11 @@ export const appMenu: TAppLink[] = [
     href: "/users",
     label: "Users",
     roles: ["admin", "superadmin"],
+  },
+  {
+    href: "/appFeedbacks",
+    label: "App Feedbacks",
+    roles: ["admin", "superadmin"],
   }
 ];
 

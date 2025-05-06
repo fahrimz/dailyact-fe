@@ -16,6 +16,7 @@ import { Route as ProfileImport } from './routes/profile'
 import { Route as LoginImport } from './routes/login'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as CategoriesImport } from './routes/categories'
+import { Route as AppFeedbacksImport } from './routes/appFeedbacks'
 import { Route as ActivitiesImport } from './routes/activities'
 import { Route as IndexImport } from './routes/index'
 
@@ -51,6 +52,12 @@ const CategoriesRoute = CategoriesImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AppFeedbacksRoute = AppFeedbacksImport.update({
+  id: '/appFeedbacks',
+  path: '/appFeedbacks',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ActivitiesRoute = ActivitiesImport.update({
   id: '/activities',
   path: '/activities',
@@ -79,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/activities'
       fullPath: '/activities'
       preLoaderRoute: typeof ActivitiesImport
+      parentRoute: typeof rootRoute
+    }
+    '/appFeedbacks': {
+      id: '/appFeedbacks'
+      path: '/appFeedbacks'
+      fullPath: '/appFeedbacks'
+      preLoaderRoute: typeof AppFeedbacksImport
       parentRoute: typeof rootRoute
     }
     '/categories': {
@@ -124,6 +138,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
+  '/appFeedbacks': typeof AppFeedbacksRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -134,6 +149,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
+  '/appFeedbacks': typeof AppFeedbacksRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -145,6 +161,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
+  '/appFeedbacks': typeof AppFeedbacksRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -157,6 +174,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/activities'
+    | '/appFeedbacks'
     | '/categories'
     | '/dashboard'
     | '/login'
@@ -166,6 +184,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/activities'
+    | '/appFeedbacks'
     | '/categories'
     | '/dashboard'
     | '/login'
@@ -175,6 +194,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/activities'
+    | '/appFeedbacks'
     | '/categories'
     | '/dashboard'
     | '/login'
@@ -186,6 +206,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivitiesRoute: typeof ActivitiesRoute
+  AppFeedbacksRoute: typeof AppFeedbacksRoute
   CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
@@ -196,6 +217,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRoute,
+  AppFeedbacksRoute: AppFeedbacksRoute,
   CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
@@ -215,6 +237,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/activities",
+        "/appFeedbacks",
         "/categories",
         "/dashboard",
         "/login",
@@ -227,6 +250,9 @@ export const routeTree = rootRoute
     },
     "/activities": {
       "filePath": "activities.tsx"
+    },
+    "/appFeedbacks": {
+      "filePath": "appFeedbacks.tsx"
     },
     "/categories": {
       "filePath": "categories.tsx"
