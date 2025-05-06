@@ -209,7 +209,7 @@ function ActivitiesPage() {
                 key={activity.id}
                 className="flex flex-col sm:flex-row gap-4 justify-between rounded-lg border p-4"
               >
-                <div>
+                <div className="sm:w-[80%]">
                   <p className="text-lg font-semibold">
                     {activity.description}
                   </p>
