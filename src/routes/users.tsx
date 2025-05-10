@@ -69,7 +69,7 @@ function RouteComponent() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async () => {
     try {
       // TODO: implement delete user
       toast.error("This feature is not implemented yet");
@@ -181,7 +181,7 @@ function RouteComponent() {
           description={`Are you sure you want to delete? This action cannot be undone.`}
           confirmLabel="Delete"
           variant="destructive"
-          onConfirm={() => handleDelete(deletingUser.id)}
+          onConfirm={handleDelete}
         />
       )}
 

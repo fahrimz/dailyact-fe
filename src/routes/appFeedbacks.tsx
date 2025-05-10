@@ -60,7 +60,7 @@ function RouteComponent() {
       </div>
 
       {/* Filters */}
-      {/* <div className="flex gap-4 mb-6">
+      <div className="flex gap-4 mb-6">
         <Input
           className="w-auto"
           placeholder="Name | Email"
@@ -68,7 +68,7 @@ function RouteComponent() {
             setFilter((prev) => ({ ...prev, search: e.target.value }));
           }}
         />
-      </div> */}
+      </div>
 
       {loading ? (
         <p>Loading...</p>

@@ -2,7 +2,7 @@
   "name": "dailyact-fe",
   "private": true,
   "type": "module",
-  "homepage": "https://fahrimz.github.io/dailyact",
+  "homepage": "https://fahrimz.github.io/dailyact-fe/",
   "scripts": {
     "dev": "vite --port 3000",
     "start": "vite --port 3000",
@@ -11,9 +11,7 @@
     "test": "vitest run",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "check": "biome check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

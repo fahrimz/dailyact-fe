@@ -40,7 +40,6 @@ export const Route = createFileRoute("/activities")({
 });
 
 function ActivitiesPage() {
-  const [view, setView] = useState<"list" | "calendar">("list");
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -201,48 +200,44 @@ function ActivitiesPage() {
       {/* Activities List/Calendar View */}
       {loading ? (
         <p>Loading...</p>
-      ) : view === "list" ? (
-        <div className="space-y-4">
-          {activities.length > 0 ? (
-            activities.map((activity) => (
-              <div
-                key={activity.id}
-                className="flex flex-col sm:flex-row gap-4 justify-between rounded-lg border p-4"
-              >
-                <div className="sm:w-[80%]">
-                  <p className="text-lg font-semibold">
-                    {activity.description}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {activity.category?.name || "No category"} •{" "}
-                    {readableDuration(activity.duration, "s")}
-                  </p>
-                  {activity.notes && (
-                    <p className="text-gray-600 mt-1">{activity.notes}</p>
-                  )}
-                </div>
-                <div className="flex flex-row sm:flex-col w-full sm:w-auto items-center justify-between gap-2">
-                  <p className="text-xs font-medium">
-                    {readableRange(activity.start_time, activity.end_time)}
-                  </p>
+      ) : <div className="space-y-4">
+      {activities.length > 0 ? (
+        activities.map((activity) => (
+          <div
+            key={activity.id}
+            className="flex flex-col sm:flex-row gap-4 justify-between rounded-lg border p-4"
+          >
+            <div className="sm:w-[80%]">
+              <p className="text-lg font-semibold">
+                {activity.description}
+              </p>
+              <p className="text-xs text-gray-500">
+                {activity.category?.name || "No category"} •{" "}
+                {readableDuration(activity.duration, "s")}
+              </p>
+              {activity.notes && (
+                <p className="text-gray-600 mt-1">{activity.notes}</p>
+              )}
+            </div>
+            <div className="flex flex-row sm:flex-col w-full sm:w-auto items-center justify-between gap-2">
+              <p className="text-xs font-medium">
+                {readableRange(activity.start_time, activity.end_time)}
+              </p>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeletingActivity(activity)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No activities found</p>
-          )}
-        </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDeletingActivity(activity)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))
       ) : (
-        <p>Calendar view coming soon</p>
+        <p>No activities found</p>
       )}
+    </div>}
 
       {/* Add Activity Form */}
       {isAddingActivity && (
