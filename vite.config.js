@@ -7,7 +7,7 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	base: 'dailyact-fe',
+	base: '/dailyact-fe',
 	plugins: [
 		TanStackRouterVite({ autoCodeSplitting: true }),
 		viteReact(),
