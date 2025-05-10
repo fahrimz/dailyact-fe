@@ -2,7 +2,7 @@
   "name": "dailyact-fe",
   "private": true,
   "type": "module",
-  "homepage": "https://fahrimz.github.io/dailyact-fe/",
+  "homepage": "https://fahrimz.github.io/dailyact-fe",
   "scripts": {
     "dev": "vite --port 3000",
     "start": "vite --port 3000",
