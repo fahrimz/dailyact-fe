@@ -58,7 +58,7 @@ export function AddFeedbackDialog() {
       <Button
         variant="outline"
         onClick={() => onOpenChange(true)}
-        className="w-full sm:w-auto fixed bottom-4 right-4 sm:bottom-8 sm:right-8 shadow-lg"
+        className="sm:w-auto fixed bottom-4 right-4 sm:bottom-8 sm:right-8 shadow-lg"
       >
         Give Feedback
       </Button>
@@ -69,10 +69,13 @@ export function AddFeedbackDialog() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="feedback">Any bug? error? or just want to pour your heart out?</Label>
+              <Label htmlFor="feedback">
+                Any bug? error? or just want to pour your heart out?
+              </Label>
               <Textarea
                 id="feedback"
                 value={feedback}
+                className="w-full"
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Enter anything"
                 required
