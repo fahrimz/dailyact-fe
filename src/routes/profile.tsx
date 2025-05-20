@@ -37,10 +37,14 @@ function ProfilePage() {
   const handleLogout = async () => {
     try {
       await authApi.logout();
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem("token");
+      if (window.location.href.includes("/dailyact-fe")) {
+        window.location.href = "/dailyact-fe/#/login";
+      } else {
+        window.location.href = "/login";
+      }
     } catch (err) {
-      console.error('Logout failed:', err);
+      console.error("Logout failed:", err);
     }
   };
 
@@ -73,9 +77,7 @@ function ProfilePage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-500">Member since</span>
-                <span>
-                  {new Date(user.created_at).toLocaleDateString()}
-                </span>
+                <span>{new Date(user.created_at).toLocaleDateString()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Authentication</span>
